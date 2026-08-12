@@ -8,11 +8,56 @@
 #define GEMINI_API                                                             \
   "https://generativelanguage.googleapis.com/v1beta/interactions"
 #define GEMINI_API_KEY ""
+static char *agentMessage =
+    "{" 
+		"\"model\": \"gemini-3.6-flash\","
+		"\"input\": \"Estou testando uma integração, responda com o nome das tools do agente\","
+		"\"tools\": ["
+			"{"
+			"\"type\": \"function\","	
+			"\"name\": \"fetch_feed\","	
+			"\"description\": \"Busca os dados do feed de notícias da url.\","	
+			"\"parameters\": {"	
+				"\"type\": \"object\","	
+				"\"properties\": {"	
+					"\"url\": { \"type\": \"string\" }"	
+				"},"
+				"\"required\": [\"url\"]"	
+			"}"
+			"},"
+			"{"
+				"\"type\": \"function\","	
+				"\"name\": \"fetch_article\","	
+				"\"description\": \"Busca os dados do artigo da url.\","	
+				"\"parameters\": {"	
+					"\"type\": \"object\","	
+					"\"properties\": {"	
+						"\"url\": { \"type\": \"string\" }"	
+					"},"
+					"\"required\": [\"url\"]"	
+				"}"
+			"},"
+			"{"
+				"\"type\": \"function\","	
+				"\"name\": \"send_email\","	
+				"\"description\": \"Envia email com o resumo das notícias mais importantes.\","	
+				"\"parameters\": {"	
+					"\"type\": \"object\","	
+					"\"properties\": {"	
+						"\"subject\": { \"type\": \"string\" },"	
+						"\"body\": { \"type\": \"string\" }"	
+					"},"
+					"\"required\": [\"subject\", \"body\"]"	
+				"}"
+			"}"
+		"]"
+	"}";
 
 struct ResponseData {
   char *chunks;
   size_t size;
 };
+
 
 // A resposta do curl chega em chunks, nao tudo de uma vez, e o curl
 // nao faz nenhuma tratativa, cabe ao usuario fazer, a funcao de callback
@@ -54,9 +99,6 @@ int main() {
   CURLcode responseCode;
   struct curl_slist *headers = NULL;
   struct ResponseData responseData;
-
-  static char *agentMessage =
-      "{ \"model\": \"gemini-3.6-flash\", \"input\": \"Estou testando uma integração, responda com 'Olá! Tudo bem?'\" }";
 
   responseCode = curl_global_init(CURL_GLOBAL_DEFAULT);
 
